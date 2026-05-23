@@ -14,23 +14,76 @@
     var levelId = Number(new URLSearchParams(location.search).get('id'));
     var levelString = new URLSearchParams(location.search).get('string');
     var songID = Number(new URLSearchParams(location.search).get('songID')) || 500476;
-    async function start() {
-      await navigator.serviceWorker.register('../worker.js');
-      await navigator.serviceWorker.ready;
+    
+    function showSWError() {
+      const overlay = document.createElement('div');
+      overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); color:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding:20px; box-sizing:border-box;";
+      overlay.innerHTML = `
+        <h2 style="color:#ff3333; margin-bottom:20px; font-size:28px;">⚠️ Error de Conexión Local</h2>
+        <p style="font-size:18px; max-width:600px; line-height:1.6; margin-bottom:20px;">
+          Geometry Dash Web requiere un <strong>servidor web local</strong> (HTTP/HTTPS) para funcionar debido a restricciones de seguridad del navegador.
+        </p>
+        <p style="font-size:16px; color:#aaa; max-width:600px; margin-bottom:30px;">
+          No se pueden cargar los archivos del nivel si abres el HTML directamente con doble clic (<code>file://</code>).
+        </p>
+        <div style="background:#1a1a1a; border:1px solid #444; padding:15px; border-radius:6px; font-family:monospace; text-align:left; font-size:14px; margin-bottom:30px; line-height:1.5;">
+          <strong>Cómo solucionarlo:</strong><br>
+          1. Abre el proyecto en VS Code y usa la extensión <strong>Live Server</strong>.<br>
+          2. O ejecuta en la consola de esta carpeta:<br>
+          <span style="color:#ffaa00;">npx http-server</span>
+        </div>
+        <button onclick="window.location.href='../'" style="background:#ffaa00; border:none; color:black; font-size:16px; padding:12px 30px; border-radius:4px; cursor:pointer; font-weight:bold; text-transform:uppercase; box-shadow: 0 4px 6px rgba(0,0,0,0.3); transition: transform 0.1s;">Volver al Menú</button>
+      `;
+      document.body.appendChild(overlay);
+    }
 
-      if (levelString) {
-        navigator.serviceWorker.controller?.postMessage({
-          levelString: levelString,
-          songID: songID
-        });
-      } else {
-        navigator.serviceWorker.controller?.postMessage({ levelId });
+    async function start() {
+      if (!navigator.serviceWorker || location.protocol === 'file:') {
+        showSWError();
+        return;
       }
 
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.src = './assets/index-game.js';
-      document.body.appendChild(script);
+      try {
+        await navigator.serviceWorker.register('../worker.js');
+        await navigator.serviceWorker.ready;
+
+        // Ensure the service worker controls the page. If not, wait for it or reload (max 3 reloads).
+        if (!navigator.serviceWorker.controller) {
+          const reloads = Number(sessionStorage.getItem('gd_sw_reloads') || 0);
+          if (reloads < 3) {
+            sessionStorage.setItem('gd_sw_reloads', reloads + 1);
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+              window.location.reload();
+            });
+            setTimeout(() => {
+              window.location.reload();
+            }, 600);
+            return;
+          } else {
+            console.warn("Service Worker failed to control the client after multiple reloads. Attempting to run anyway...");
+          }
+        } else {
+          sessionStorage.removeItem('gd_sw_reloads');
+        }
+
+        // Send parameters via message as fallback
+        if (levelString) {
+          navigator.serviceWorker.controller.postMessage({
+            levelString: levelString,
+            songID: songID
+          });
+        } else {
+          navigator.serviceWorker.controller.postMessage({ levelId });
+        }
+
+        const script = document.createElement('script');
+        script.type = 'module';
+        script.src = './assets/index-game.js';
+        document.body.appendChild(script);
+      } catch (err) {
+        console.error("Failed to register Service Worker:", err);
+        showSWError();
+      }
     }
     function updateLevelName() {
       if (levelString) {
