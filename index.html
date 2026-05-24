@@ -531,6 +531,37 @@
     .showcase-btn:hover {
       transform: scale(1.15);
     }
+
+    /* Level Progress bar styles */
+    .level-progress-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 5px;
+      width: 100%;
+      max-width: 250px;
+    }
+    .level-progress-bar {
+      flex-grow: 1;
+      height: 8px;
+      background: rgba(0, 0, 0, 0.5);
+      border: 1.5px solid rgba(255, 255, 255, 0.3);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+    .level-progress-fill {
+      height: 100%;
+      background: #2ece63;
+      box-shadow: 0 0 5px rgba(46, 206, 99, 0.5);
+    }
+    .level-progress-text {
+      font-size: 10px;
+      color: #2ece63;
+      -webkit-text-stroke: 0.5px black;
+      text-shadow: 1px 1px 0px black;
+      font-family: 'Pusab', sans-serif;
+    }
   </style>
 </head>
 
@@ -697,6 +728,26 @@
     let favorites = JSON.parse(localStorage.getItem('gd_favorites') || '[]');
     let completed = JSON.parse(localStorage.getItem('gd_completed') || '[]');
 
+    // Sync levels with 100% progress into the completed list
+    function syncCompletedLevels() {
+      try {
+        const progressMap = JSON.parse(localStorage.getItem('gd_level_progress') || '{}');
+        let completedChanged = false;
+        for (const [lvlId, percent] of Object.entries(progressMap)) {
+          if (percent === 100 && !completed.includes(lvlId)) {
+            completed.push(lvlId);
+            completedChanged = true;
+          }
+        }
+        if (completedChanged) {
+          localStorage.setItem('gd_completed', JSON.stringify(completed));
+        }
+      } catch (e) {
+        console.error("Error syncing completed levels:", e);
+      }
+    }
+    syncCompletedLevels();
+
     // Audio system
     const clickSFX = new Audio('game/assets/playSound_01.ogg');
     const bgMusic = new Audio('game/assets/music/-2.mp3');
@@ -749,12 +800,28 @@
     function toggleCompleted(id) {
       playSFX();
       const index = completed.indexOf(id);
+      let progressMap = {};
+      try {
+        progressMap = JSON.parse(localStorage.getItem('gd_level_progress') || '{}');
+      } catch (e) {
+        console.error("Error loading progress map in toggleCompleted:", e);
+      }
+      
       if (index === -1) {
         completed.push(id);
+        progressMap[id] = 100;
       } else {
         completed.splice(index, 1);
+        delete progressMap[id];
       }
-      localStorage.setItem('gd_completed', JSON.stringify(completed));
+      
+      try {
+        localStorage.setItem('gd_completed', JSON.stringify(completed));
+        localStorage.setItem('gd_level_progress', JSON.stringify(progressMap));
+      } catch (e) {
+        console.error("Error saving updated progress in toggleCompleted:", e);
+      }
+      
       updateStatsPanel();
       renderPage();
     }
@@ -858,12 +925,20 @@
         return;
       }
 
+      let progressMap = {};
+      try {
+        progressMap = JSON.parse(localStorage.getItem('gd_level_progress') || '{}');
+      } catch (e) {
+        console.error("Error loading progress in renderPage:", e);
+      }
+
       pageItems.forEach(item => {
         const row = document.createElement('div');
         row.className = `level-item ${item.style || ''}`;
         
         const isFav = favorites.includes(item.id);
         const isComp = completed.includes(item.id);
+        const progress = progressMap[item.id] || 0;
 
         row.innerHTML = `
           <div class="difficulty-container">
@@ -873,6 +948,14 @@
           <div class="level-main-info">
             <p class="level-name">${item.name}</p>
             <span class="level-creator">BY ${item.creator.toUpperCase()}</span>
+            ${item.id !== 'custom' && progress > 0 ? `
+              <div class="level-progress-container">
+                <div class="level-progress-bar">
+                  <div class="level-progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <span class="level-progress-text">${progress}%</span>
+              </div>
+            ` : ''}
           </div>
           
           ${item.id !== 'custom' ? `
@@ -933,6 +1016,13 @@
         return;
       }
 
+      let progressMap = {};
+      try {
+        progressMap = JSON.parse(localStorage.getItem('gd_level_progress') || '{}');
+      } catch (e) {
+        console.error("Error loading progress in renderWbdlPage:", e);
+      }
+
       pageItems.forEach(item => {
         const row = document.createElement('div');
         row.className = `level-item`;
@@ -941,7 +1031,8 @@
         const face = rank <= 30 ? faces.extremeDemon : faces.easyDemon;
         const diffLabel = rank <= 30 ? "Extreme" : "Demon";
         const points = (250 * Math.exp(-0.0263 * (rank - 1))).toFixed(2);
-        
+        const progress = progressMap[item.level_id] || 0;
+
         row.innerHTML = `
           <span class="demon-rank ${rank <= 3 ? 'top3' : ''}">#${rank}</span>
           <div class="difficulty-container">
@@ -951,6 +1042,14 @@
           <div class="level-main-info">
             <p class="level-name">${item.name}</p>
             <span class="level-creator">BY ${item.author.toUpperCase()} &bull; <span style="color:#00ff44;">${points} PTS</span></span>
+            ${progress > 0 ? `
+              <div class="level-progress-container">
+                <div class="level-progress-bar">
+                  <div class="level-progress-fill" style="width: ${progress}%"></div>
+                </div>
+                <span class="level-progress-text">${progress}%</span>
+              </div>
+            ` : ''}
           </div>
           <div class="demon-actions">
             ${item.showcase_link ? `

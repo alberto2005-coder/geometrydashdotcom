@@ -15,6 +15,27 @@
     var levelString = new URLSearchParams(location.search).get('string');
     var songID = Number(new URLSearchParams(location.search).get('songID')) || 500476;
     
+    // Save progress hook from the game engine
+    window.saveGDProgress = function(percent) {
+      if (isNaN(percent)) return;
+      // Use the actual parameter id (can be positive custom level or negative official level)
+      const currentId = new URLSearchParams(location.search).get('id');
+      if (!currentId) return;
+      
+      try {
+        let progressMap = JSON.parse(localStorage.getItem('gd_level_progress') || '{}');
+        const currentBest = progressMap[currentId] || 0;
+        
+        if (percent > currentBest) {
+          progressMap[currentId] = Math.min(100, Math.max(0, Math.floor(percent)));
+          localStorage.setItem('gd_level_progress', JSON.stringify(progressMap));
+          console.log(`Saved level ${currentId} progress: ${percent}%`);
+        }
+      } catch (e) {
+        console.error("Error saving level progress:", e);
+      }
+    };
+    
     function showSWError() {
       const overlay = document.createElement('div');
       overlay.style = "position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); color:white; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding:20px; box-sizing:border-box;";
