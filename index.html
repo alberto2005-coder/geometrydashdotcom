@@ -24,7 +24,7 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: radial-gradient(circle, var(--bg-blue) 0%, var(--bg-blue-dark) 100%);
+      background: transparent;
       color: white;
       font-family: 'Pusab', sans-serif;
       display: flex;
@@ -33,6 +33,23 @@
       justify-content: center;
       overflow: hidden;
       user-select: none;
+    }
+
+    /* Shift background color dynamically */
+    .bg-gradient {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle, var(--bg-blue) 0%, var(--bg-blue-dark) 100%);
+      z-index: -2;
+      animation: gd-bg-shift 25s infinite linear;
+    }
+
+    @keyframes gd-bg-shift {
+      0% { filter: hue-rotate(0deg); }
+      100% { filter: hue-rotate(360deg); }
     }
 
     #file-warning-bar {
@@ -62,6 +79,61 @@
       height: 100vh;
       z-index: -1;
       pointer-events: none;
+    }
+
+    /* Player Profile Panel */
+    .profile-card {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 3px solid white;
+      border-radius: 8px;
+      padding: 8px 14px;
+      z-index: 100;
+      font-family: 'Pusab', sans-serif;
+      font-size: 11px;
+      color: white;
+      -webkit-text-stroke: 0.5px black;
+      text-shadow: 1px 1px 0px black;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    }
+    .avatar-container {
+      width: 38px;
+      height: 38px;
+      flex-shrink: 0;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s;
+      cursor: pointer;
+    }
+    .avatar-container:hover {
+      transform: scale(1.1) rotate(5deg);
+    }
+    .gd-avatar {
+      width: 100%;
+      height: 100%;
+    }
+    .profile-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    .stat-icon {
+      font-size: 11px;
+      -webkit-text-stroke: 0px;
+      text-shadow: none;
     }
 
     .audio-control {
@@ -130,7 +202,7 @@
       font-family: 'Pusab', sans-serif;
       font-size: 12px;
       padding: 8px 12px;
-      width: 220px;
+      width: 200px;
       outline: none;
       -webkit-text-stroke: 0.5px black;
       text-shadow: 1px 1px 0px black;
@@ -250,6 +322,10 @@
       text-transform: uppercase;
       -webkit-text-stroke: var(--gd-text-stroke);
       text-shadow: var(--gd-text-shadow);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 320px;
     }
 
     .level-creator {
@@ -258,6 +334,45 @@
       -webkit-text-stroke: var(--gd-text-stroke);
       text-shadow: var(--gd-text-shadow);
       margin-top: 3px;
+    }
+
+    /* Meta buttons (Fav and Complete) inside rows */
+    .level-meta-buttons {
+      display: flex;
+      gap: 10px;
+      margin-right: 20px;
+    }
+    .meta-btn {
+      background: rgba(0, 0, 0, 0.4);
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-radius: 6px;
+      color: rgba(255, 255, 255, 0.6);
+      font-size: 14px;
+      width: 34px;
+      height: 34px;
+      cursor: pointer;
+      transition: all 0.1s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      outline: none;
+    }
+    .meta-btn:hover {
+      transform: scale(1.1);
+      border-color: white;
+      color: white;
+    }
+    .fav-btn.active {
+      background: rgba(233, 30, 99, 0.15);
+      border-color: #e91e63;
+      color: #e91e63;
+      text-shadow: 0 0 5px rgba(233, 30, 99, 0.5);
+    }
+    .comp-btn.active {
+      background: rgba(253, 196, 22, 0.15);
+      border-color: #fdc416;
+      color: #fdc416;
+      text-shadow: 0 0 5px rgba(253, 196, 22, 0.5);
     }
 
     .play-btn {
@@ -420,6 +535,9 @@
 </head>
 
 <body>
+  <!-- Dynamic Background Shifter -->
+  <div class="bg-gradient"></div>
+
   <!-- Warning Bar for file:// protocol -->
   <div id="file-warning-bar">
     ⚠️ Estás abriendo el juego desde un archivo local (file://). Los niveles NO funcionarán. Por favor, ejecuta un servidor local (ej. Live Server o npx http-server).
@@ -427,6 +545,23 @@
 
   <!-- Particle Background Canvas -->
   <canvas id="particle-canvas"></canvas>
+
+  <!-- Player Profile stats card -->
+  <div class="profile-card">
+    <div class="avatar-container" onclick="playSFX()" title="¡Avatar de Geometry Dash!">
+      <svg class="gd-avatar" viewBox="0 0 100 100">
+        <rect x="15" y="15" width="70" height="70" fill="#2ece63" stroke="black" stroke-width="6" rx="4"/>
+        <rect x="25" y="30" width="16" height="16" fill="yellow" stroke="black" stroke-width="4" rx="2"/>
+        <rect x="59" y="30" width="16" height="16" fill="yellow" stroke="black" stroke-width="4" rx="2"/>
+        <path d="M 30 65 Q 50 80 70 65" fill="none" stroke="black" stroke-width="6" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="profile-stats">
+      <div class="stat-item" title="Niveles Completados"><span class="stat-icon">🏆</span> <span id="stats-completed">0</span></div>
+      <div class="stat-item" title="Demons Superados"><span class="stat-icon">👹</span> <span id="stats-demons">0</span></div>
+      <div class="stat-item" title="Favoritos"><span class="stat-icon">❤️</span> <span id="stats-favs">0</span></div>
+    </div>
+  </div>
 
   <!-- Mute/Unmute audio button -->
   <div id="audio-btn" class="audio-control" onclick="toggleMute()" title="Activar/Silenciar Música">
@@ -449,6 +584,7 @@
       <button class="filter-btn" onclick="filterDifficulty('Harder', this)">Harder</button>
       <button class="filter-btn" onclick="filterDifficulty('Insane', this)">Insane</button>
       <button class="filter-btn" onclick="filterDifficulty('Demon', this)">Demon</button>
+      <button class="filter-btn" onclick="filterDifficulty('favorites', this)" style="border-color: #e91e63;">❤️ Favs</button>
     </div>
   </div>
 
@@ -513,7 +649,19 @@
       { name: "Fingerdash", creator: "RobTop", id: "-21", face: faces.insane, diff: "Insane" },
       { name: "Dash", creator: "RobTop", id: "-22", face: faces.insane, diff: "Insane" },
       { name: "Every End", creator: "MindCap", id: "-23", style: "every-end-style", face: faces.extremeDemon, diff: "Extreme" },
-      { name: "Ultiate Destruction", creator: "RobTop", id: "-24", face: faces.hard, diff: "Hard" }
+      { name: "Ultiate Destruction", creator: "RobTop", id: "-24", face: faces.hard, diff: "Hard" },
+      
+      // Curated Custom Community Levels (positive IDs)
+      { name: "ReTray", creator: "Dioli", id: "11356877", face: faces.easy, diff: "Easy" },
+      { name: "Sonar", creator: "JerkRat", id: "4454123", face: faces.easy, diff: "Easy" },
+      { name: "The Nightmare", creator: "Jax", id: "13519", face: faces.easyDemon, diff: "Demon" },
+      { name: "The Lightning Road", creator: "timeless real", id: "55520", face: faces.easyDemon, diff: "Demon" },
+      { name: "Decode", creator: "Rek3dge", id: "2905391", face: faces.easyDemon, diff: "Demon" },
+      { name: "B", creator: "Motleyorc", id: "34161749", face: faces.easyDemon, diff: "Demon" },
+      { name: "Bloodbath", creator: "Riot", id: "10565740", face: faces.extremeDemon, diff: "Extreme" },
+      { name: "Sonic Wave", creator: "lSunix", id: "62030588", face: faces.extremeDemon, diff: "Extreme" },
+      { name: "Limbo", creator: "MindCap", id: "85655755", face: faces.extremeDemon, diff: "Extreme" },
+      { name: "Tidal Wave", creator: "OniLink", id: "95574343", face: faces.extremeDemon, diff: "Extreme" }
     ];
 
     const fallbackWbdl = [
@@ -545,6 +693,10 @@
     let wbdlCurrentPage = 0;
     const wbdlItemsPerPage = 10;
 
+    // Local Stats system (Favorites & Completed)
+    let favorites = JSON.parse(localStorage.getItem('gd_favorites') || '[]');
+    let completed = JSON.parse(localStorage.getItem('gd_completed') || '[]');
+
     // Audio system
     const clickSFX = new Audio('game/assets/playSound_01.ogg');
     const bgMusic = new Audio('game/assets/music/-2.mp3');
@@ -573,6 +725,53 @@
     function updateAudioButton() {
       const btn = document.getElementById('audio-btn');
       btn.innerText = bgmEnabled ? '🔊' : '🔇';
+    }
+
+    // Favorites & Completed Toggle Logic
+    function toggleFavorite(id) {
+      playSFX();
+      const index = favorites.indexOf(id);
+      if (index === -1) {
+        favorites.push(id);
+      } else {
+        favorites.splice(index, 1);
+      }
+      localStorage.setItem('gd_favorites', JSON.stringify(favorites));
+      updateStatsPanel();
+      
+      if (selectedDifficulty === 'favorites') {
+        filterLevels();
+      } else {
+        renderPage();
+      }
+    }
+
+    function toggleCompleted(id) {
+      playSFX();
+      const index = completed.indexOf(id);
+      if (index === -1) {
+        completed.push(id);
+      } else {
+        completed.splice(index, 1);
+      }
+      localStorage.setItem('gd_completed', JSON.stringify(completed));
+      updateStatsPanel();
+      renderPage();
+    }
+
+    function updateStatsPanel() {
+      document.getElementById('stats-completed').innerText = completed.length;
+      document.getElementById('stats-favs').innerText = favorites.length;
+      
+      // Count completed levels that are demon or extreme difficulty
+      let demonCount = 0;
+      completed.forEach(id => {
+        const lvl = levels.find(l => l.id === id);
+        if (lvl && (lvl.diff.toLowerCase() === 'demon' || lvl.diff.toLowerCase() === 'extreme')) {
+          demonCount++;
+        }
+      });
+      document.getElementById('stats-demons').innerText = demonCount;
     }
 
     // Modal Control
@@ -627,9 +826,16 @@
         }
         const matchesSearch = item.name.toLowerCase().includes(query) || 
                               item.creator.toLowerCase().includes(query);
+        
         let matchesDiff = true;
         if (selectedDifficulty !== "all") {
-          matchesDiff = item.diff.toLowerCase() === selectedDifficulty.toLowerCase();
+          if (selectedDifficulty === 'favorites') {
+            matchesDiff = favorites.includes(item.id);
+          } else if (selectedDifficulty.toLowerCase() === 'demon') {
+            matchesDiff = item.diff.toLowerCase() === 'demon' || item.diff.toLowerCase() === 'extreme';
+          } else {
+            matchesDiff = item.diff.toLowerCase() === selectedDifficulty.toLowerCase();
+          }
         }
         return matchesSearch && matchesDiff;
       });
@@ -656,6 +862,9 @@
         const row = document.createElement('div');
         row.className = `level-item ${item.style || ''}`;
         
+        const isFav = favorites.includes(item.id);
+        const isComp = completed.includes(item.id);
+
         row.innerHTML = `
           <div class="difficulty-container">
             <img src="${item.face}" class="difficulty-face">
@@ -665,6 +874,14 @@
             <p class="level-name">${item.name}</p>
             <span class="level-creator">BY ${item.creator.toUpperCase()}</span>
           </div>
+          
+          ${item.id !== 'custom' ? `
+            <div class="level-meta-buttons">
+              <button class="meta-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.id}')" title="Favorito">❤️</button>
+              <button class="meta-btn comp-btn ${isComp ? 'active' : ''}" onclick="toggleCompleted('${item.id}')" title="Marcar completado">🏆</button>
+            </div>
+          ` : ''}
+
           <img src="img/Play.webp" 
                class="play-btn" onclick="handleInteraction('${item.id}')">
         `;
@@ -810,6 +1027,7 @@
 
     // Page Load Setup
     updateAudioButton();
+    updateStatsPanel();
     renderPage();
 
     // Check protocol warning
