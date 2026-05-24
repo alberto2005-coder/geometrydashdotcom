@@ -253,8 +253,7 @@
       bottom: 8.5%;
       z-index: 1; 
       background: #8e4f2b; 
-      overflow-y: scroll;
-      overflow-x: hidden;
+      overflow: hidden;
       scrollbar-width: none;
       display: none; 
     }
@@ -681,7 +680,7 @@
     ];
 
     let currentPage = 0;
-    const itemsPerPage = 10;
+    const itemsPerPage = 3;
     let currentTab = 'levels';
 
     // Search and Filter State
@@ -692,7 +691,7 @@
     // WBDL State
     let wbdlDemons = [];
     let wbdlCurrentPage = 0;
-    const wbdlItemsPerPage = 10;
+    const wbdlItemsPerPage = 3;
 
     // Local Stats system (Favorites & Completed)
     let favorites = JSON.parse(localStorage.getItem('gd_favorites') || '[]');
