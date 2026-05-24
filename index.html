@@ -349,14 +349,16 @@
       font-size: 14px;
       width: 34px;
       height: 34px;
-      cursor: pointer;
-      transition: all 0.1s ease;
       display: flex;
       align-items: center;
       justify-content: center;
       outline: none;
+      transition: all 0.1s ease;
     }
-    .meta-btn:hover {
+    .fav-btn {
+      cursor: pointer;
+    }
+    .fav-btn:hover {
       transform: scale(1.1);
       border-color: white;
       color: white;
@@ -366,6 +368,14 @@
       border-color: #e91e63;
       color: #e91e63;
       text-shadow: 0 0 5px rgba(233, 30, 99, 0.5);
+    }
+    .comp-btn {
+      cursor: default;
+      pointer-events: none;
+    }
+    .comp-btn:not(.active) {
+      opacity: 0.25;
+      filter: grayscale(100%);
     }
     .comp-btn.active {
       background: rgba(253, 196, 22, 0.15);
@@ -797,34 +807,7 @@
       }
     }
 
-    function toggleCompleted(id) {
-      playSFX();
-      const index = completed.indexOf(id);
-      let progressMap = {};
-      try {
-        progressMap = JSON.parse(localStorage.getItem('gd_level_progress') || '{}');
-      } catch (e) {
-        console.error("Error loading progress map in toggleCompleted:", e);
-      }
-      
-      if (index === -1) {
-        completed.push(id);
-        progressMap[id] = 100;
-      } else {
-        completed.splice(index, 1);
-        delete progressMap[id];
-      }
-      
-      try {
-        localStorage.setItem('gd_completed', JSON.stringify(completed));
-        localStorage.setItem('gd_level_progress', JSON.stringify(progressMap));
-      } catch (e) {
-        console.error("Error saving updated progress in toggleCompleted:", e);
-      }
-      
-      updateStatsPanel();
-      renderPage();
-    }
+    // Completion trophies are locked to automatic in-game progress
 
     function updateStatsPanel() {
       document.getElementById('stats-completed').innerText = completed.length;
@@ -961,7 +944,7 @@
           ${item.id !== 'custom' ? `
             <div class="level-meta-buttons">
               <button class="meta-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFavorite('${item.id}')" title="Favorito">❤️</button>
-              <button class="meta-btn comp-btn ${isComp ? 'active' : ''}" onclick="toggleCompleted('${item.id}')" title="Marcar completado">🏆</button>
+              <div class="meta-btn comp-btn ${isComp ? 'active' : ''}" title="${isComp ? 'Nivel Completado al 100%' : 'No completado'}">🏆</div>
             </div>
           ` : ''}
 
