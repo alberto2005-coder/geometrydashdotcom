@@ -70,7 +70,7 @@ Créditos al proyecto original: [lasokar/geometrydashdotcom](https://github.com/
 
 ### Licencia
 
-Este repositorio es un fork. Consulta el archivo [LICENSE](LICENSE) para conocer el alcance de la licencia sobre las aportaciones propias y las condiciones del código original.
+Este repositorio es un fork. Consulta [LICENSE](LICENSE) para la licencia MIT de las aportaciones propias y [NOTICE.md](NOTICE.md) para el alcance y la autoría del código original.
 
 ---
 
@@ -140,4 +140,4 @@ Credits to the original project: [lasokar/geometrydashdotcom](https://github.com
 
 ### License
 
-This repository is a fork. See the [LICENSE](LICENSE) file for the scope of the license covering the author's own contributions and the terms of the original code.
+This repository is a fork. See [LICENSE](LICENSE) for the MIT license covering the author's own contributions and [NOTICE.md](NOTICE.md) for the scope and attribution of the original code.

@@ -19,22 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-## Nota de alcance / Scope note
-
-Este repositorio es un fork de **lasokar/geometrydashdotcom**
-(https://github.com/lasokar/geometrydashdotcom).
-
-La licencia MIT anterior se aplica **únicamente a las aportaciones originales
-de Alberto Ortiz Sánchez** incluidas en este fork. El código, los recursos y
-los assets heredados del proyecto original **no se relicencian** por este
-archivo y siguen perteneciendo a sus autores originales, que no han publicado
-una licencia para ellos. *Geometry Dash* y todos sus recursos originales son
-propiedad de RobTop Games.
-
-This repository is a fork of **lasokar/geometrydashdotcom**. The MIT license
-above applies only to Alberto Ortiz Sánchez's original contributions. Upstream
-code and assets are not relicensed by this file and remain the property of
-their respective authors.
