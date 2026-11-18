@@ -623,6 +623,7 @@
 </head>
 
 <body>
+  <h1 style="position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0">Geometry Dash Web: play the cube game in your browser</h1>
   <!-- Dynamic Background Shifter -->
   <div class="bg-gradient"></div>
 
@@ -680,8 +681,8 @@
     <div class="page-indicator" id="page-text">PAGE 1</div>
     <div class="hub-frame-overlay"></div>
 
-    <img src="img/Next.png" id="prev-btn" class="nav-arrow" onclick="changePage(-1)">
-    <img src="img/Next.png" id="next-btn" class="nav-arrow" onclick="changePage(1)">
+    <img src="img/Next.png" id="prev-btn" class="nav-arrow" onclick="changePage(-1)" alt="">
+    <img src="img/Next.png" id="next-btn" class="nav-arrow" onclick="changePage(1)" alt="">
 
     <div id="level-list" class="content-viewport active"></div>
 
@@ -972,7 +973,7 @@
 
         row.innerHTML = `
           <div class="difficulty-container">
-            <img src="${item.face}" class="difficulty-face">
+            <img src="${item.face}" class="difficulty-face" alt="">
             <span class="difficulty-label">${item.diff}</span>
           </div>
           <div class="level-main-info">
@@ -996,7 +997,7 @@
           ` : ''}
 
           <img src="img/Play.webp" 
-               class="play-btn" onclick="handleInteraction('${item.id}')">
+               class="play-btn" onclick="handleInteraction('${item.id}')" alt="">
         `;
         container.appendChild(row);
       });
@@ -1066,7 +1067,7 @@
         row.innerHTML = `
           <span class="demon-rank ${rank <= 3 ? 'top3' : ''}">#${rank}</span>
           <div class="difficulty-container">
-            <img src="${face}" class="difficulty-face">
+            <img src="${face}" class="difficulty-face" alt="">
             <span class="difficulty-label">${diffLabel}</span>
           </div>
           <div class="level-main-info">
@@ -1085,7 +1086,7 @@
                 <path fill="#FF0000" d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.517 3.545 12 3.545 12 3.545s-7.516 0-9.387.507a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.871.507 9.388.507 9.388.507s7.518 0 9.388-.507a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
               </svg>
             ` : ''}
-            <img src="img/Play.webp" class="play-btn" onclick="handleInteraction('${item.level_id}')" title="Jugar Nivel">
+            <img src="img/Play.webp" class="play-btn" onclick="handleInteraction('${item.level_id}')" title="Jugar Nivel" alt="">
           </div>
         `;
         container.appendChild(row);
